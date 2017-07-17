@@ -32,6 +32,9 @@ import 'brace/theme/tomorrow_night_bright'
 import 'brace/theme/tomorrow_night_blue'
 import hotkeys from 'hotkeys-js'
 
+// article
+import './css/article.scss'
+
 // showdown
 import showdown from 'showdown'
 import './js/showdown-plugins/showdown-prettify-for-wechat.js'
@@ -61,11 +64,11 @@ const tmpl = `<div class="mpeditor">
       </li>
       <li class="mpe-nav-item mpe-nav-select">
         <select eid="editorTheme">
-          <option value="solarized_light">「默认」solarized_light</option>
-          <option selected value="solarized_dark">solarized_dark</option>
+          <option selected value="ambiance">「默认」ambiance</option>
+          <option value="solarized_light">solarized_light</option>
+          <option value="solarized_dark">solarized_dark</option>
           <option value="chrome">chrome</option>
           <option value="chaos">chaos</option>
-          <option value="ambiance">ambiance</option>
           <option value="clouds">clouds</option>
           <option value="clouds_midnight">clouds_midnight</option>
           <option value="cobalt">cobalt</option>
@@ -82,6 +85,15 @@ const tmpl = `<div class="mpeditor">
           <option value="tomorrow_night">tomorrow_night</option>
           <option value="tomorrow_night_bright">tomorrow_night_bright</option>
           <option value="tomorrow_night_blue">tomorrow_night_blue</option>
+        </select>
+      </li>
+      <li class="mpe-nav-item mpe-nav-text">
+        <span>选择格式化方案</span>
+      </li>
+      <li class="mpe-nav-item mpe-nav-select">
+        <select eid="articleTheme">
+          <option selected value="article-default">默认方案</option>
+          <option value="article-notify">通知方案</option>
         </select>
       </li>
       <li class="mpe-nav-item">
@@ -365,6 +377,15 @@ export default class Editor {
       // 存储
       LS.mpe_editorTheme = theme
     })
+    this.$articleTheme.on('change', function () {
+      let prevTheme = LS.mpe_articleTheme ? LS.mpe_articleTheme : 'article-default'
+      let nextTheme = this.value
+      // $preview.attr('mpe-preview ' + theme)
+      $container.find('.mpe-preview').removeClass(prevTheme)
+      $container.find('.mpe-preview').addClass(nextTheme)
+      // 储存
+      LS.mpe_articleTheme = nextTheme
+    })
     this.$transferBtn.on('click', () => {
       [LS.mpe_previewClass, LS.mpe_editorClass] = [LS.mpe_editorClass, LS.mpe_previewClass]
       $container.find('.mpe-col').toggleClass('mpe_fr mpe_fl')
@@ -496,7 +517,13 @@ export default class Editor {
     aceSession.setMode('ace/mode/markdown')
     aceSession.$selectLongWords = true
     aceRenderer.setPadding(15)
-    let theme = LS.mpe_editorTheme ? LS.mpe_editorTheme : 'solarized_light'
+    let theme = LS.mpe_editorTheme ? LS.mpe_editorTheme : 'ambiance'
+    // MyKeyVans Mod: 添加公众号格式方案
+    let articleTheme = LS.mpe_articleTheme ? LS.mpe_articleTheme : 'article-default'
+    this.$articleTheme.val(articleTheme)
+    this.$container.find('.mpe-preview').addClass(articleTheme)
+    // 储存
+    LS.mpe_articleTheme = articleTheme
     this.$editorTheme.val(theme)
     editor.setTheme('ace/theme/' + theme)
     if (val) {
